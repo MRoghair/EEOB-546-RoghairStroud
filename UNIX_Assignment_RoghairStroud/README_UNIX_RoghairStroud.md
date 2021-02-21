@@ -56,7 +56,7 @@ wc -l maize_genotypes.txt
 
 Here is my brief description of what this code does
 
-* I first extracted the header of `fang_et_al_genotypes.txt` and created the new `maize_genotypes.txt file. I then extracted lines containing the pattern ZMMIL using grep and sent the output there. I repeated this with ZMMLR and ZMMMR, appending the new information to the end of the existing file. I used `wc -l` at the end to ensure I had the correct 1573 lines of data I anticipated having, plus one for the header.
+* I first extracted the header of `fang_et_al_genotypes.txt` and created the new `maize_genotypes.txt` file. I then extracted lines containing the pattern ZMMIL using grep and sent the output there. I repeated this with ZMMLR and ZMMMR, appending the new information to the end of the existing file. I used `wc -l` at the end to ensure I had the correct 1573 lines of data I anticipated having, plus one for the header.
 
 ###Teosinte Data
 
@@ -72,4 +72,4 @@ wc -l teosinite_genotypes.txt
 
 Here is my brief description of what this code does
 
-* I first extracted the header of `fang_et_al_genotypes.txt` and created the new `teosinite_genotypes.txt file. I then extracted lines containing the pattern ZMPBA using grep and sent the output there. I repeated this with ZMPIL and ZMPJA, appending the new information to the end of the existing file. I used `wc -l` at the end to ensure I had the correct 975 lines of data I anticipated having, plus one for the header.
+* I first extracted the header of `fang_et_al_genotypes.txt` and created the new `teosinite_genotypes.txt` file. I then extracted lines containing the pattern ZMPBA using grep and sent the output there. I repeated this with ZMPIL and ZMPJA, appending the new information to the end of the existing file. I used `wc -l` at the end to ensure I had the correct 975 lines of data I anticipated having, plus one for the header.
