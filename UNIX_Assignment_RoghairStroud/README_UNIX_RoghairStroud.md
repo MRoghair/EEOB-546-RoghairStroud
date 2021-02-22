@@ -69,7 +69,11 @@ wc -l maize_genotypes.txt
 
 awk -f transpose.awk maize_genotypes.txt > transposed_maize_genotypes.txt
 sort -k1,1 transposed_maize_genotypes.txt > sort_transp_maize_genotypes.txt
+```
 
+Here, I tried to use `sed` to replace `Sample_ID` with `SNP_ID` so the headers of the two files would merge during the join, but my sed command wasn't running, so I manually edited it with TextEdit, then checked that all my characters were still ASCII using the `file` command. After that, I proceeded to join the SNP position file with the maize genotype file.
+
+```
 join -1 1 -2 1 sort_snp_abbrev_position.txt sort_transp_maize_genotypes.txt > maize_snp_positions.txt
 awk -v OFS='\t' '{ $1=$1; print }' maize_snp_positions.txt > maize_snp_positions_tabs.txt
 ```
@@ -79,6 +83,7 @@ Here is my brief description of what this code does
 * I first extracted the header of `fang_et_al_genotypes.txt` and created the new `maize_genotypes.txt` file. I then extracted lines containing the pattern ZMMIL using grep and sent the output there. I repeated this with ZMMLR and ZMMMR, appending the new information to the end of the existing file. I used `wc -l` at the end to ensure I had the correct 1573 lines of data I anticipated having, plus one for the header.
 * I transposed the data using the `transpose.awk` script 
 * I sorted the data by the SNP_ID column in preparation for the join with the SNP position file
+
 * I joined the sorted SNP position file to the sorted maize genotype file by the first column (`SNP_ID`) of each.
 * I then used an `awk` command I found online to change the delimiter from spaces to tabs 
 
@@ -96,7 +101,11 @@ wc -l teosinite_genotypes.txt
 
 awk -f transpose.awk teosinite_genotypes.txt > transposed_teosinite_genotypes.txt
 sort -k1,1 transposed_teosinite_genotypes.txt > sort_transp_teosinite_genotypes.txt
+```
 
+Here, I did the same thing as with the Maize data, manually editing the header to read `SNP_ID` instead of `Sample_ID`. 
+
+```
 join -1 1 -2 1 sort_snp_abbrev_position.txt sort_transp_teosinite_genotypes.txt > teosinite_snp_positions.txt
 awk -v OFS='\t' '{ $1=$1; print }' teosinite_snp_positions.txt > teosinite_snp_positions_tabs.txt
 ```
