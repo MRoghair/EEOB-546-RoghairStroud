@@ -90,6 +90,23 @@ Here is my brief description of what this code does
 * I then used an `awk` command I found online to change the delimiter from spaces to tabs 
 * I used two `grep` commands to pull out the header, followed by the rest of the file, into a new file. This way, my header was back at the top of the file. I'm sure there's an easier way to do this, but it worked just fine here.
 
+####Sorting and organizing the data 
+
+```
+grep SNP maize_snp_positions_header.txt > maize_unknown_snp_positions.txt
+grep unknown maize_snp_positions_header.txt >> maize_unknown_snp_positions.txt
+
+grep SNP maize_snp_positions_header.txt > maize_multiple_snp_positions.txt
+grep multiple maize_snp_positions_header.txt >> maize_multiple_snp_positions.txt 
+```
+
+Brief description of the code:
+* These commands pulled out the data on each the SNPs with either multiple or unknown positions in the genome. For both, I began by pulling out the header of the file, followed by all lines that contained either "multiple" or "unknown". These files are not sorted in any specific way
+
+
+
+
+
 
 
 ###Teosinte Data
@@ -122,4 +139,19 @@ Here is my brief description of what this code does
 * I joined the sorted SNP position file to the sorted teosinite genotype file by the first column (`SNP_ID`) of each.
 * I then used an `awk` command I found online to change the delimiter from spaces to tabs
 * I used the same two `grep` commands as earlier to put my header back at the top of my file. 
+
+
+####Sorting and organizing the data
+
+```
+grep SNP teosinite_snp_positions_header.txt > teosinite_unknown_snp_positions.txt
+grep unknown teosinite_snp_positions_header.txt >> teosinite_unknown_snp_positions.txt
+
+grep SNP teosinite_snp_positions_header.txt > teosinite_multiple_snp_positions.txt
+grep multiple teosinite_snp_positions_header.txt >> teosinite_multiple_snp_positions.txt
+```
+
+Brief description of the code:
+* These commands pulled out the data on each the SNPs with either multiple or unknown positions in the teosinite genome. For both, I began by pulling out the header of the file, followed by all lines that contained either "multiple" or "unknown". These files are not sorted in any specific way
+
 
