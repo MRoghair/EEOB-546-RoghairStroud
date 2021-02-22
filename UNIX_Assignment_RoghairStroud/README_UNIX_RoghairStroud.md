@@ -40,6 +40,8 @@ By inspecting this file I learned that:
 * There are 3 teosinite genotypes: ZMPBA, ZMPIL, and ZMPJA. Using `grep`, I found that there were 900 lines containing ZMPBA, 41 lines containing ZMPIL, and 34 lines containing ZMPJA. This means my `teosinite_genotypes.txt` file should contain 975 lines of data.
 
 
+
+
 ##Data Processing
 
 ###SNP Position Data (same for Maize and Teosinite)
@@ -55,6 +57,7 @@ A breif description of what the code does:
 * `sort` is used to sort the abbreviated SNP position file by the first column (SNP_ID)
 
 
+
 ###Maize Data
 
 ```
@@ -67,7 +70,8 @@ wc -l maize_genotypes.txt
 awk -f transpose.awk maize_genotypes.txt > transposed_maize_genotypes.txt
 sort -k1,1 transposed_maize_genotypes.txt > sort_transp_maize_genotypes.txt
 
-
+join -1 1 -2 1 sort_snp_abbrev_position.txt sort_transp_maize_genotypes.txt > maize_snp_positions.txt
+awk -v OFS='\t' '{ $1=$1; print }' maize_snp_positions.txt > maize_snp_positions_tabs.txt
 ```
 
 Here is my brief description of what this code does
@@ -75,6 +79,9 @@ Here is my brief description of what this code does
 * I first extracted the header of `fang_et_al_genotypes.txt` and created the new `maize_genotypes.txt` file. I then extracted lines containing the pattern ZMMIL using grep and sent the output there. I repeated this with ZMMLR and ZMMMR, appending the new information to the end of the existing file. I used `wc -l` at the end to ensure I had the correct 1573 lines of data I anticipated having, plus one for the header.
 * I transposed the data using the `transpose.awk` script 
 * I sorted the data by the SNP_ID column in preparation for the join with the SNP position file
+* I joined the sorted SNP position file to the sorted maize genotype file by the first column (`SNP_ID`) of each.
+* I then used an `awk` command I found online to change the delimiter from spaces to tabs 
+
 
 
 
@@ -87,9 +94,11 @@ grep ZMPIL fang_et_al_genotypes.txt >> teosinite_genotypes.txt
 grep ZMPJA fang_et_al_genotypes.txt >> teosinite_genotypes.txt
 wc -l teosinite_genotypes.txt
 
-awk -f transpose.awk teosinite_genotypes.txt > teosinite_transposed_genotypes.txt
+awk -f transpose.awk teosinite_genotypes.txt > transposed_teosinite_genotypes.txt
 sort -k1,1 transposed_teosinite_genotypes.txt > sort_transp_teosinite_genotypes.txt
 
+join -1 1 -2 1 sort_snp_abbrev_position.txt sort_transp_teosinite_genotypes.txt > teosinite_snp_positions.txt
+awk -v OFS='\t' '{ $1=$1; print }' teosinite_snp_positions.txt > teosinite_snp_positions_tabs.txt
 ```
 
 Here is my brief description of what this code does
@@ -97,4 +106,7 @@ Here is my brief description of what this code does
 * I first extracted the header of `fang_et_al_genotypes.txt` and created the new `teosinite_genotypes.txt` file. I then extracted lines containing the pattern ZMPBA using grep and sent the output there. I repeated this with ZMPIL and ZMPJA, appending the new information to the end of the existing file. I used `wc -l` at the end to ensure I had the correct 975 lines of data I anticipated having, plus one for the header.
 * I transposed the data using the `transpose.awk` script 
 * I sorted the data by the SNP_ID column in preparation for the join with the SNP position file
+* I joined the sorted SNP position file to the sorted teosinite genotype file by the first column (`SNP_ID`) of each.
+* I then used an `awk` command I found online to change the delimiter from spaces to tabs
+
 
