@@ -76,6 +76,8 @@ Here, I tried to use `sed` to replace `Sample_ID` with `SNP_ID` so the headers o
 ```
 join -1 1 -2 1 sort_snp_abbrev_position.txt sort_transp_maize_genotypes.txt > maize_snp_positions.txt
 awk -v OFS='\t' '{ $1=$1; print }' maize_snp_positions.txt > maize_snp_positions_tabs.txt
+grep SNP maize_snp_positions_tabs.txt > maize_snp_positions_header.txt
+grep -v SNP maize_snp_positions_tabs.txt >> maize_snp_positions_header.txt
 ```
 
 Here is my brief description of what this code does
@@ -86,7 +88,7 @@ Here is my brief description of what this code does
 
 * I joined the sorted SNP position file to the sorted maize genotype file by the first column (`SNP_ID`) of each.
 * I then used an `awk` command I found online to change the delimiter from spaces to tabs 
-
+* I used two `grep` commands to pull out the header, followed by the rest of the file, into a new file. This way, my header was back at the top of the file. I'm sure there's an easier way to do this, but it worked just fine here.
 
 
 
@@ -108,6 +110,8 @@ Here, I did the same thing as with the Maize data, manually editing the header t
 ```
 join -1 1 -2 1 sort_snp_abbrev_position.txt sort_transp_teosinite_genotypes.txt > teosinite_snp_positions.txt
 awk -v OFS='\t' '{ $1=$1; print }' teosinite_snp_positions.txt > teosinite_snp_positions_tabs.txt
+grep SNP teosinite_snp_positions_tabs.txt > teosinite_snp_positions_header.txt
+grep -v SNP teosinite_snp_positions_tabs.txt >> teosinite_snp_positions_header.txt
 ```
 
 Here is my brief description of what this code does
@@ -117,5 +121,5 @@ Here is my brief description of what this code does
 * I sorted the data by the SNP_ID column in preparation for the join with the SNP position file
 * I joined the sorted SNP position file to the sorted teosinite genotype file by the first column (`SNP_ID`) of each.
 * I then used an `awk` command I found online to change the delimiter from spaces to tabs
-
+* I used the same two `grep` commands as earlier to put my header back at the top of my file. 
 
