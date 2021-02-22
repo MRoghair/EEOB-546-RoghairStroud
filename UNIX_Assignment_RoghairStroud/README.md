@@ -1,4 +1,5 @@
 #UNIX Assignment
+Marissa Roghair Stroud
 
 ##Data Inspection
 
