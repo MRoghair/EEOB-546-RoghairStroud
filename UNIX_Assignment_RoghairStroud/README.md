@@ -1,10 +1,10 @@
-#UNIX Assignment
+# UNIX Assignment
 
 Marissa Roghair Stroud
 
-##Data Inspection
+## Data Inspection
 
-###Attributes of `fang_et_al_genotypes`
+### Attributes of `fang_et_al_genotypes`
 
 ```
 wc fang_et_al_genotypes
@@ -30,7 +30,7 @@ By inspecting this file I learned that:
 
 
 
-###Attributes of `snp_position.txt`
+### Attributes of `snp_position.txt`
 
 ```
 wc snp_position.txt
@@ -47,9 +47,9 @@ By inspecting this file I learned that:
 
 
 
-##Data Processing
+## Data Processing
 
-###SNP Position Data (same for Maize and Teosinite)
+### SNP Position Data (same for Maize and Teosinite)
 
 ```
 awk `{ print $1 "\t" $3 "\t" $4 }` snp_positions.txt > snp_abbrev_positions.txt
@@ -63,7 +63,7 @@ A breif description of what the code does:
 
 
 
-###Maize Data
+### Maize Data
 
 ```
 head -n 1 fang_et_al_genotypes.txt > maize_genotypes.txt
@@ -95,7 +95,7 @@ Here is my brief description of what this code does
 * I then used an `awk` command I found online to change the delimiter from spaces to tabs 
 * I used two `grep` commands to pull out the header, followed by the rest of the file, into a new file. This way, my header was back at the top of the file. I'm sure there's an easier way to do this, but it worked just fine here.
 
-####Sorting and organizing the maize data 
+#### Sorting and organizing the maize data 
 
 ```
 grep SNP maize_snp_positions_header.txt > maize_unknown_snp_positions.txt
@@ -133,7 +133,7 @@ awk '$2 ~ /1/ && $2 < 2' maize_inv-sorted-missing-data.txt >> maize_chrom1-inv-s
 
 
 
-###Teosinte Data
+### Teosinte Data
 
 Most of the code (and descriptions) used in this section are identical to the maize data in the previous section. 
 
@@ -170,7 +170,7 @@ Here is my brief description of what this code does
 * I used the same two `grep` commands as earlier to put my header back at the top of my file. 
 
 
-####Sorting and organizing the teosinite data
+#### Sorting and organizing the teosinite data
 
 ```
 grep SNP teosinite_snp_positions_header.txt > teosinite_unknown_snp_positions.txt
