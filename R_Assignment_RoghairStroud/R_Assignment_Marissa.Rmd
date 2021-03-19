@@ -1,0 +1,365 @@
+---
+title: "R_assignment_Marissa"
+author: "Marissa Roghair Stroud"
+date: "3/17/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Assignment Markdown
+
+### Setup and file import:
+
+```{r}
+library(tidyverse)
+```
+
+Note that I imported fang_genotypes twice, once with and once without the header. It was more useful to analyze the file's information with a header, but transpose it without one.
+
+```{r}
+fang_genotypes <- read.table('fang_et_al_genotypes.txt', header=T)
+fang_genotypes2 <- read.table('fang_et_al_genotypes.txt', header=F)
+
+snp_positions <- read.table('snp_position.txt', header=T, sep = "\t")
+```
+
+
+### File Information
+
+This set of commands gives information about the structure of each of the files we are working with in this dataset. 
+
+For the `fang_et_al_genotypes` file, we obtain the following information:
+
+* The file is a list with 986 columns
+* The file is formatted as a data frame
+* The size of the file is **21.6 Mb**
+* The file has 2782 rows and 986 columns
+
+For the `snp_positions` file, we obtain the following information:
+
+* The file is a list with 15 columns
+* The file is formatted as a data frame
+* The size of the file is **319.7 Kb**
+* The file has 983 rows and 15 columns
+
+```{r}
+typeof(fang_genotypes)
+length(fang_genotypes)
+class(fang_genotypes)
+print(object.size(fang_genotypes), units = "auto")
+
+typeof(snp_positions)
+length(snp_positions)
+class(snp_positions)
+print(object.size(snp_positions), units = "auto")
+
+dim(fang_genotypes)
+dim(snp_positions)
+```
+
+This command tells us how many lines of data to expect for each Maize and Teosinite genotypes. Maize genotypes (ZMMIL, ZMMLR, and ZMMMR) should have a total of 1573 lines of data, and Teosinite genotypes (ZMPBA, ZMPIL, and ZMPJA) should have 975 lines of data.
+
+```{r}
+fang_genotypes %>% count(Group) 
+``` 
+
+
+
+### Reformatting the data files
+
+The data was transposed, then the information from column V3 (the one containing "Group" information) was made the column headers.
+
+```{r}
+trans_fang2 <- as.data.frame(t(fang_genotypes2))
+fang_colnames2 <- fang_genotypes2$V3
+colnames(trans_fang2) <- fang_colnames2
+```
+
+
+### Setting data up for merging
+
+These lines of code are used to sort the `fang_et_al_genotypes` file into data for each Maize and Teosinite. The file originally had no header, so the header was applied after sorting. The `snp_positions` file was filtered so only 3 columns (SNP_ID, Chromosome, and Position) remained.
+
+```{r}
+maize_genos <- trans_fang2[names(trans_fang2) %in% c("Group", "ZMMIL", "ZMMLR", "ZMMMR")]  
+names(maize_genos) <- as.matrix(maize_genos[1, ]) 
+
+teosinite_genos <- trans_fang2[names(trans_fang2) %in% c("Group", "ZMPBA", "ZMPIL", "ZMPJA")]  
+names(teosinite_genos) <- as.matrix(teosinite_genos[1, ]) 
+
+abbrv_snp_positons <- select(snp_positions, SNP_ID, Chromosome, Position)
+```
+
+
+### Merging, filtering, and sorting Maize data
+
+First, the abbreviated `snp_positions` file was merged with the `fang_et_al_genotypes` file for the Maize genotypes. Following this, columns for SNPs whose positions were unknown or multiple were removed from the dataset. This decreased the number of SNPs we are looking at from 983 to 939, removing 44 SNPs from the dataset. 
+
+Following filtering, the data were sorted each by increasing and decreasing position on the chromosomes. For the set that were sorted by decreasing position values, the "?/?" marker for missing data was replaced with "-/-" 
+
+```{r}
+merged.maize <- merge(abbrv_snp_positons, maize_genos, by.x="SNP_ID", by.y="Sample_ID")
+
+maize_filtered <- filter(merged.maize, Position != "multiple", Position != "unknown", Chromosome != "multiple", Chromosome != "unknown")
+maize_filtered$Position <- as.numeric(as.character(maize_filtered$Position))
+maize_filtered_sorted <- maize_filtered[order(maize_filtered$Position), ]
+
+#Before to filtering out multiple/unknowns
+merged.maize %>% count(Chromosome) 
+#After filtering out multiple/unknown
+maize_filtered_sorted %>% count(Chromosome) 
+
+maize_decreasing <- maize_filtered[order(maize_filtered$Position, decreasing=TRUE), ]
+maize_decreasing_sub2 <- lapply(maize_decreasing, function(x) (gsub("[?]", "-", x)))
+maize_decreasing_sub <- as.data.frame(maize_decreasing_sub2)
+```
+
+### Merging, filtering, and sorting Teosinite data
+
+First, the abbreviated `snp_positions` file was merged with the `fang_et_al_genotypes` file for the Teosinite genotypes. Following this, columns for SNPs whose positions were "unknown" or "multiple" were removed from the dataset. This decreased the number of SNPs we were looking at from 983 to 939, removing 44 SNPs from the dataset. 
+
+Following filtering, the data were sorted each by increasing and decreasing position on the chromosomes. For the set that were sorted by decreasing position values, the "?/?" marker for missing data was replaced with "-/-" 
+
+```{r}
+merged.teosinite <- merge(abbrv_snp_positons, teosinite_genos, by.x="SNP_ID", by.y="Sample_ID")
+
+teosinite_filtered <- filter(merged.teosinite, Position != "multiple", Position != "unknown", Chromosome != "multiple", Chromosome != "unknown")
+teosinite_filtered$Position <- as.numeric(as.character(teosinite_filtered$Position))
+teosinite_filtered_sorted <- teosinite_filtered[order(teosinite_filtered$Position), ]
+
+#Before to filtering out multiple/unknowns
+merged.teosinite %>% count(Chromosome) 
+#After filtering out multiple/unknown
+teosinite_filtered %>% count(Chromosome) 
+
+
+teosinite_decreasing <- teosinite_filtered[order(teosinite_filtered$Position, decreasing=TRUE), ]
+teosinite_decreasing_sub2 <- lapply(teosinite_decreasing, function(x) (gsub("[?]", "-", x)))
+teosinite_decreasing_sub <- as.data.frame(teosinite_decreasing_sub2)
+```
+
+
+### Sorting data by chromosome number
+
+Next, the data were filtered into 40 individual files. These are separated by genotype (Maize/Teosinite) and chromosome number, with one set sorted by increasing position values and missing data indicated by "?/?", and the other sorted by decreasing position values and missing data indicated by "-/-".
+
+```{r}
+# maize data, one file per chromosome, with data sorted by increasing position value and missing data indicated by "?"
+maize_chr1 <- filter(maize_filtered_sorted, Chromosome == 1)
+maize_chr2 <- filter(maize_filtered_sorted, Chromosome == 2)
+maize_chr3 <- filter(maize_filtered_sorted, Chromosome == 3)
+maize_chr4 <- filter(maize_filtered_sorted, Chromosome == 4)
+maize_chr5 <- filter(maize_filtered_sorted, Chromosome == 5)
+maize_chr6 <- filter(maize_filtered_sorted, Chromosome == 6)
+maize_chr7 <- filter(maize_filtered_sorted, Chromosome == 7)
+maize_chr8 <- filter(maize_filtered_sorted, Chromosome == 8)
+maize_chr9 <- filter(maize_filtered_sorted, Chromosome == 9)
+maize_chr10 <- filter(maize_filtered_sorted, Chromosome == 10)
+
+# maize data, one file per chromosome, with data sorted by decreasing position value and missing data indicated by "-"
+maize_chr1_dec <- filter(maize_decreasing_sub, Chromosome == 1)
+maize_chr2_dec <- filter(maize_decreasing_sub, Chromosome == 2)
+maize_chr3_dec <- filter(maize_decreasing_sub, Chromosome == 3)
+maize_chr4_dec <- filter(maize_decreasing_sub, Chromosome == 4)
+maize_chr5_dec <- filter(maize_decreasing_sub, Chromosome == 5)
+maize_chr6_dec <- filter(maize_decreasing_sub, Chromosome == 6)
+maize_chr7_dec <- filter(maize_decreasing_sub, Chromosome == 7)
+maize_chr8_dec <- filter(maize_decreasing_sub, Chromosome == 8)
+maize_chr9_dec <- filter(maize_decreasing_sub, Chromosome == 9)
+maize_chr10_dec <- filter(maize_decreasing_sub, Chromosome == 10)
+
+# teosinite data, one file per chromosome, with data sorted by increasing position value and missing data indicated by "?"
+teosinite_chr1 <- filter(teosinite_filtered_sorted, Chromosome == 1)
+teosinite_chr2 <- filter(teosinite_filtered_sorted, Chromosome == 2)
+teosinite_chr3 <- filter(teosinite_filtered_sorted, Chromosome == 3)
+teosinite_chr4 <- filter(teosinite_filtered_sorted, Chromosome == 4)
+teosinite_chr5 <- filter(teosinite_filtered_sorted, Chromosome == 5)
+teosinite_chr6 <- filter(teosinite_filtered_sorted, Chromosome == 6)
+teosinite_chr7 <- filter(teosinite_filtered_sorted, Chromosome == 7)
+teosinite_chr8 <- filter(teosinite_filtered_sorted, Chromosome == 8)
+teosinite_chr9 <- filter(teosinite_filtered_sorted, Chromosome == 9)
+teosinite_chr10 <- filter(teosinite_filtered_sorted, Chromosome == 10)
+
+# teosinite data, one file per chromosome, with data sorted by increasing position value and missing data indicated by "?"
+teosinite_chr1_dec <- filter(teosinite_decreasing_sub, Chromosome == 1)
+teosinite_chr2_dec <- filter(teosinite_decreasing_sub, Chromosome == 2)
+teosinite_chr3_dec <- filter(teosinite_decreasing_sub, Chromosome == 3)
+teosinite_chr4_dec <- filter(teosinite_decreasing_sub, Chromosome == 4)
+teosinite_chr5_dec <- filter(teosinite_decreasing_sub, Chromosome == 5)
+teosinite_chr6_dec <- filter(teosinite_decreasing_sub, Chromosome == 6)
+teosinite_chr7_dec <- filter(teosinite_decreasing_sub, Chromosome == 7)
+teosinite_chr8_dec <- filter(teosinite_decreasing_sub, Chromosome == 8)
+teosinite_chr9_dec <- filter(teosinite_decreasing_sub, Chromosome == 9)
+teosinite_chr10_dec <- filter(teosinite_decreasing_sub, Chromosome == 10)
+```
+
+
+
+## Plots
+
+### SNPs per Chromosome
+
+Code to prepare the data for graphing
+```{r}
+maize_filtered_sorted$Chromosome <- as.integer(maize_filtered_sorted$Chromosome)
+teosinite_filtered_sorted$Chromosome <- as.integer(teosinite_filtered_sorted$Chromosome)
+
+# I created a second "chromosome" variable that was a factor so I could plot each chromosome as its own color, rather than the whole set in a gradient
+maize_filtered_sorted$Chromosome.Number <- as.factor(maize_filtered_sorted$Chromosome)
+teosinite_filtered_sorted$Chromosome.Number <- as.factor(teosinite_filtered_sorted$Chromosome)
+
+```
+
+
+##### **Total number of SNPs per chromosome** 
+(this is the same data for both Maize and Teosinite, so there is only one graph)
+
+```{r, echo = FALSE}
+ggplot(data = maize_filtered_sorted) + 
+  geom_bar(mapping = aes(x = Chromosome), color = "black", fill = "coral3") +
+  labs(title = "Total Number of SNPs on Chromosomes 1-10") +
+  xlab("Chromosome Number") + ylab("SNP Count") + 
+  theme(plot.title = element_text(face = "bold", hjust = 0.5)) +
+  scale_x_continuous(breaks=c(1:10), 
+                     labels=c("1","2", "3", "4", "5", "6", "7", "8", "9", "10"))
+```
+
+##### **Distribution of SNPs on chromosomes:**
+(this is also the same data for both Maize and Teosinite, so there is only one graph)
+
+```{r, echo = FALSE}
+ggplot(data = maize_filtered_sorted) + 
+  geom_point(mapping = aes(x=Chromosome, y=Position, color=Chromosome.Number)) +
+  xlab("Chromosome Number") + ylab("Position") +
+  labs(title = "Distribution of SNPs on Chromosomes 1-10") +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5), legend.position = "none") +
+  scale_x_continuous(breaks=c(1:10), 
+                     labels=c("1","2", "3", "4", "5", "6", "7", "8", "9", "10"))
+```
+
+
+
+##### Heterozygosity
+
+**Preparing maize and teosinite data for graphing**
+
+Here, I first used `pivot_longer` to change my data to the "long" format, then I added back in the `Group` and `JG_OTU` columns since it had been lost during the previous file merge. To plot heterozygosity, I decided to copy the `value` column (the one containing the A/A, C/G, etc. information) and name it `Homozygosity`. Then, I swapped out values equal to A/A, T/T, C/C, or G/G with "Homozygous". Everything that was not named "Homozygous" was renamed to "Heterozygous". Finally, any data with "?/?" listed in the `value` column was named "Missing". The same procedure was used for both Maize and Teosinite data. 
+
+```{r}
+maize_pivot <- pivot_longer(maize_filtered_sorted, c(4:1576)) 
+maize_pivot <- select(maize_pivot, SNP_ID, Chromosome, Position, name, value) 
+maize.genos.t <- as.data.frame(t(maize_genos)) 
+maize_groups <- select(maize.genos.t, "V1", "V2", "V3") 
+names(maize_groups) <- as.matrix(maize_groups[1, ])  
+maize_pivot_info <- merge(maize_groups, maize_pivot, by.x="Sample_ID", by.y="name") 
+
+maize_pivot_info <- mutate(maize_pivot_info, Homozygosity = value) #creating a new column identical to "value" (G/G, A/A...)
+maize_pivot_info$Homozygosity[ maize_pivot_info$Homozygosity == "A/A"] = "Homozygous"  #Replace A/A in the Homozygosity column with "Homozygous"
+maize_pivot_info$Homozygosity[ maize_pivot_info$Homozygosity == "T/T"] = "Homozygous"  #Replace T/T in the Homozygosity column with "Homozygous"
+maize_pivot_info$Homozygosity[ maize_pivot_info$Homozygosity == "C/C"] = "Homozygous"  #Replace C/C in the Homozygosity column with "Homozygous"
+maize_pivot_info$Homozygosity[ maize_pivot_info$Homozygosity == "G/G"] = "Homozygous"  #Replace G/G in the Homozygosity column with "Homozygous"
+maize_pivot_info$Homozygosity[ maize_pivot_info$Homozygosity != "Homozygous"] = "Heterozygous" #Replace everything that ISN'T "Homozygous" with "Heterozygous"
+maize_pivot_info$Homozygosity[ maize_pivot_info$value == "?/?"] = "Missing" #For every row with "?/?" in the "value" column, name it "Missing" in the "homozygosity" column
+
+
+teosinite_pivot <- pivot_longer(teosinite_filtered_sorted, c(4:978)) 
+teosinite_pivot <- select(teosinite_pivot, SNP_ID, Chromosome, Position, name, value) 
+teosinite.genos.t <- as.data.frame(t(teosinite_genos)) 
+teosinite_groups <- select(teosinite.genos.t, "V1", "V2", "V3") 
+names(teosinite_groups) <- as.matrix(teosinite_groups[1, ])  
+teosinite_pivot_info <- merge(teosinite_groups, teosinite_pivot, by.x="Sample_ID", by.y="name") 
+
+teosinite_pivot_info <- mutate(teosinite_pivot_info, Homozygosity = value) #creating a new column identical to "value" (G/G, A/A...)
+teosinite_pivot_info$Homozygosity[ teosinite_pivot_info$Homozygosity == "A/A"] = "Homozygous"  #Replace A/A in the Homozygosity column with "Homozygous"
+teosinite_pivot_info$Homozygosity[ teosinite_pivot_info$Homozygosity == "T/T"] = "Homozygous"  #Replace T/T in the Homozygosity column with "Homozygous"
+teosinite_pivot_info$Homozygosity[ teosinite_pivot_info$Homozygosity == "C/C"] = "Homozygous"  #Replace C/C in the Homozygosity column with "Homozygous"
+teosinite_pivot_info$Homozygosity[ teosinite_pivot_info$Homozygosity == "G/G"] = "Homozygous"  #Replace G/G in the Homozygosity column with "Homozygous"
+teosinite_pivot_info$Homozygosity[ teosinite_pivot_info$Homozygosity != "Homozygous"] = "Heterozygous" #Replace everything that ISN'T "Homozygous" with "Heterozygous"
+teosinite_pivot_info$Homozygosity[ teosinite_pivot_info$value == "?/?"] = "Missing" #For every row with "?/?" in the "value" column, name it "Missing" in the "homozygosity" column
+```
+
+##### Plots for Maize data
+
+To plot this data, I used the `ggplot` bar chart function. My x-axis was Sample_ID, and I used the "fill" option to stack the bars for Heterozygous, Homozygous, and Missing data counts atop one another. Because all Sample_ID's had the same number of data points (939), there were no position adjustments that were needed, as the bars were already the same height.
+
+```{r, echo = FALSE}
+ggplot(data = maize_pivot_info) + 
+  geom_bar(mapping = aes(x = Sample_ID, fill = Homozygosity), width = 1) +
+  labs(title = "Amount of Heterozygosity in Maize Samples") +
+  ylab("Count") + scale_x_discrete(labels=NULL) +  
+  theme(plot.title = element_text(face = "bold", hjust = 0.5), 
+        legend.title = element_blank()) +
+  scale_fill_manual(values = c('Heterozygous' = 'darkgoldenrod2', 
+                                 'Homozygous' = 'coral3', 
+                                 'Missing' = 'darkslateblue'))
+```
+
+This plot depicts the same data as the one above it, but now it is sorted into groups by maize genotype: ZMMIL, ZMMMR, and ZMMLR. It is obvious from this chart that the group ZMMLR stands apart from the other two, in that it has much more heterozygosity present among its SNPs than the other two groups. 
+
+```{r, echo = FALSE}
+ggplot(data = maize_pivot_info) + 
+  geom_bar(mapping = aes(x = Sample_ID, fill = Homozygosity), width = 1) +
+  scale_x_discrete(labels=NULL) + ylab("Count") +
+  facet_grid(~ Group, scales = "free", space = "free") + 
+  labs(title = "Amount of Heterozygosity in Maize Samples") +
+  theme(strip.text.x = element_text(angle = 90, size = 8, face = "bold"),
+        plot.title = element_text(face = "bold", hjust = 0.5), 
+        legend.title = element_blank()) +
+  scale_fill_manual(values = c('Heterozygous' = 'darkgoldenrod2', 
+                                 'Homozygous' = 'coral3', 
+                                 'Missing' = 'darkslateblue'))
+```
+
+##### Plots for Teosinite data
+
+To plot this data, I used the `ggplot` bar chart function. My x-axis was Sample_ID, and I used the "fill" option to stack the bars for Heterozygous, Homozygous, and Missing data counts atop one another. Again, because all Sample_ID's had the same number of data points (939), there were no position adjustments that were needed, as the bars were already the same height.
+
+```{r, echo = FALSE}
+ggplot(data = teosinite_pivot_info) + 
+  geom_bar(mapping = aes(x = Sample_ID, fill = Homozygosity), width = 1) +
+  labs(title = "Amount of Heterozygosity in Teosinite Samples") +
+  ylab("Count") + scale_x_discrete(labels=NULL) +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5), 
+        legend.title = element_blank()) +
+  scale_fill_manual(values = c('Heterozygous' = 'darkgoldenrod2', 
+                                 'Homozygous' = 'coral3', 
+                                 'Missing' = 'darkslateblue'))
+```
+
+This plot depicts the same data as the one above it, but now it is sorted into groups by teosinite genotype: ZMPBA, ZMPIL, and ZMPJA. It is obvious from this chart that the group ZMPIL stands apart from the other two, in that it is much more homozygous than the other two groups. 
+
+```{r, echo = FALSE}
+ggplot(data = teosinite_pivot_info) + 
+  geom_bar(mapping = aes(x = Sample_ID, fill = Homozygosity), width = 1) +
+  scale_x_discrete(labels=NULL) + ylab("Count") +
+  facet_grid(~ Group, scales = "free", space = "free") + 
+  labs(title = "Amount of Heterozygosity in Teosinite Samples") +
+  theme(strip.text.x = element_text(angle = 90, size = 8, face = "bold"),
+        plot.title = element_text(face = "bold", hjust = 0.5), 
+        legend.title = element_blank()) +
+  scale_fill_manual(values = c('Heterozygous' = 'darkgoldenrod2', 
+                                 'Homozygous' = 'coral3', 
+                                 'Missing' = 'darkslateblue'))
+```
+
+### Visualization of some other feature in the dataset
+
+I chose to plot the density of SNPs on the 10 different chromosomes. In the first plot we ran (above), it appears that the number of SNPS in chromosomes 5 and 7 was higher than would expected, based on the downward trend of the other chromosomes. In this plot, you can see that chromosomes 5 and 7 do have a higher density of SNPs than many of the other chromosomes, as they do peak much higher in the density plot.
+
+```{r, echo = FALSE}
+ggplot(data = maize_filtered_sorted) + 
+  ylab("Density") +
+  labs(title = "Density of SNPs on Chromosomes 1-10") +
+  geom_density(mapping = aes(x=Position, linetype=Chromosome.Number,  fill = Chromosome.Number,
+                             color = Chromosome.Number), alpha=0.12) +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5))
+```
+
+
+
+
+
+
