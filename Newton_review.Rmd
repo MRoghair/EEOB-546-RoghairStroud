@@ -1,0 +1,23 @@
+---
+title: "Peer Review"
+author: "Carter Newton"
+date: "3/21/2021"
+output: html_document
+---
+
+## Peer Review
+\ 
+
+For my peer review I decided to open another seperate project in Rstudio and follow your rmarkdown line for line and reproduce your project.  
+If I run into any issues I'll reference the line number of the code chunk in your rmarkdown file or just leave any general tips. 
+Hope this helps!
+
+***
+
+At line 233: For your SNP distribution, my graph actually looks just like yours and I remember being frustrated with the dots getting really clumped together and being too small. If thats something that was possibly bugging you, theres lots of point shapes to choose from. I think in the command geom_point() you simply put "shape = 'x'". There's values that represent different points or you can even type what shape you want. I put "shape = '_'" and then put "size = 5" and that made me feel pretty content with my graph. It made the points bigger but also seemed like it made some more space between each individual one since each point was then an underscore. Just a suggestion, otherwise the graph is great!
+\ 
+
+I will be honest, I ran your code line for line and I never encountered any issues. 
+I did notice while doing my other peer review that they converted their 40 files for the chromosomes to .txt files again.   
+I'm not sure if that's required in the project, but I'm personally going to do it for mine and I figured I should at least suggest it to you as well.   
+Other than that, I don't really have much else to say I think your project was well organized and very efficient. Great job!  
