@@ -83,6 +83,8 @@ colnames(trans_fang2) <- fang_colnames2
 
 These lines of code are used to sort the `fang_et_al_genotypes` file into data for each Maize and Teosinite. The file originally had no header, so the header was applied after sorting. The `snp_positions` file was filtered so only 3 columns (SNP_ID, Chromosome, and Position) remained.
 
+(Please excuse my oversight of spelling of Teosinte as "Teosinite" throughout the _entire_ document. I didn't realize it until I was finished coding, and I didn't want to go back and change it and risk breaking the code!)
+
 ```{r}
 maize_genos <- trans_fang2[names(trans_fang2) %in% c("Group", "ZMMIL", "ZMMLR", "ZMMMR")]  
 names(maize_genos) <- as.matrix(maize_genos[1, ]) 
@@ -196,6 +198,62 @@ teosinite_chr9_dec <- filter(teosinite_decreasing_sub, Chromosome == 9)
 teosinite_chr10_dec <- filter(teosinite_decreasing_sub, Chromosome == 10)
 ```
 
+### Exporting the files
+
+```{r}
+
+dir.create("maize_files")
+setwd("./maize_files")
+write.csv(maize_chr1, file = "maize_chr1.csv", row.names = FALSE)
+write.csv(maize_chr2, file = "maize_chr2.csv", row.names = FALSE)
+write.csv(maize_chr3, file = "maize_chr3.csv", row.names = FALSE)
+write.csv(maize_chr4, file = "maize_chr4.csv", row.names = FALSE)
+write.csv(maize_chr5, file = "maize_chr5.csv", row.names = FALSE)
+write.csv(maize_chr6, file = "maize_chr6.csv", row.names = FALSE)
+write.csv(maize_chr7, file = "maize_chr7.csv", row.names = FALSE)
+write.csv(maize_chr8, file = "maize_chr8.csv", row.names = FALSE)
+write.csv(maize_chr9, file = "maize_chr9.csv", row.names = FALSE)
+write.csv(maize_chr10, file = "maize_chr10.csv", row.names = FALSE)
+
+write.csv(maize_chr1_dec, file = "maize_chr1_dec.csv", row.names = FALSE)
+write.csv(maize_chr2_dec, file = "maize_chr2_dec.csv", row.names = FALSE)
+write.csv(maize_chr3_dec, file = "maize_chr3_dec.csv", row.names = FALSE)
+write.csv(maize_chr4_dec, file = "maize_chr4_dec.csv", row.names = FALSE)
+write.csv(maize_chr5_dec, file = "maize_chr5_dec.csv", row.names = FALSE)
+write.csv(maize_chr6_dec, file = "maize_chr6_dec.csv", row.names = FALSE)
+write.csv(maize_chr7_dec, file = "maize_chr7_dec.csv", row.names = FALSE)
+write.csv(maize_chr8_dec, file = "maize_chr8_dec.csv", row.names = FALSE)
+write.csv(maize_chr9_dec, file = "maize_chr9_dec.csv", row.names = FALSE)
+write.csv(maize_chr10_dec, file = "maize_chr10_dec.csv", row.names = FALSE)
+
+
+setwd("..")
+dir.create("teosinte_files")
+setwd("./teosinte_files")
+write.csv(teosinite_chr1, file = "teosinite_chr1.csv", row.names = FALSE)
+write.csv(teosinite_chr2, file = "teosinite_chr2.csv", row.names = FALSE)
+write.csv(teosinite_chr3, file = "teosinite_chr3.csv", row.names = FALSE)
+write.csv(teosinite_chr4, file = "teosinite_chr4.csv", row.names = FALSE)
+write.csv(teosinite_chr5, file = "teosinite_chr5.csv", row.names = FALSE)
+write.csv(teosinite_chr6, file = "teosinite_chr6.csv", row.names = FALSE)
+write.csv(teosinite_chr7, file = "teosinite_chr7.csv", row.names = FALSE)
+write.csv(teosinite_chr8, file = "teosinite_chr8.csv", row.names = FALSE)
+write.csv(teosinite_chr9, file = "teosinite_chr9.csv", row.names = FALSE)
+write.csv(teosinite_chr10, file = "teosinite_chr10.csv", row.names = FALSE)
+
+write.csv(teosinite_chr1_dec, file = "teosinite_chr1_dec.csv", row.names = FALSE)
+write.csv(teosinite_chr2_dec, file = "teosinite_chr2_dec.csv", row.names = FALSE)
+write.csv(teosinite_chr3_dec, file = "teosinite_chr3_dec.csv", row.names = FALSE)
+write.csv(teosinite_chr4_dec, file = "teosinite_chr4_dec.csv", row.names = FALSE)
+write.csv(teosinite_chr5_dec, file = "teosinite_chr5_dec.csv", row.names = FALSE)
+write.csv(teosinite_chr6_dec, file = "teosinite_chr6_dec.csv", row.names = FALSE)
+write.csv(teosinite_chr7_dec, file = "teosinite_chr7_dec.csv", row.names = FALSE)
+write.csv(teosinite_chr8_dec, file = "teosinite_chr8_dec.csv", row.names = FALSE)
+write.csv(teosinite_chr9_dec, file = "teosinite_chr9_dec.csv", row.names = FALSE)
+write.csv(teosinite_chr10_dec, file = "teosinite_chr10_dec.csv", row.names = FALSE)
+
+```
+
 
 
 ## Plots
@@ -232,7 +290,7 @@ ggplot(data = maize_filtered_sorted) +
 
 ```{r, echo = FALSE}
 ggplot(data = maize_filtered_sorted) + 
-  geom_point(mapping = aes(x=Chromosome, y=Position, color=Chromosome.Number)) +
+  geom_point(mapping = aes(x=Chromosome, y=Position, color=Chromosome.Number), shape = '_', size = 10, alpha = 0.4) +
   xlab("Chromosome Number") + ylab("Position") +
   labs(title = "Distribution of SNPs on Chromosomes 1-10") +
   theme(plot.title = element_text(face = "bold", hjust = 0.5), legend.position = "none") +
